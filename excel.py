@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 Program:
 This program will record log into Excel.
@@ -59,7 +58,7 @@ def output(filename):
     "query": {
     "bool": {
       "must": [
-      {"term": {"language": "zh-TW"}}      ,{"match": {"categories": "科技"}},
+      {"term": {"language": "zh-TW"}}      ,{"match": {"categories": "健康"}},
         {"range" :{"updated" : {
           "gt":"now-7d/d",
           "lt":"now"
@@ -77,16 +76,19 @@ def output(filename):
         }
     }
 }]
-    res = esCluster.search(index="articles", doc_type="article", body=body[0])
-#print (res["aggregations"]["articles_over_time"]["buckets"])
-    for out in range(0,1):
+    for out in range(0,2):#外圈跑全部跟單一分類
+      
       for num in range(0,7):
-       print (res["aggregations"]["articles_over_time"]["buckets"][num]["key_as_string"])
-       print (res["aggregations"]["articles_over_time"]["buckets"][num]["doc_count"])
-       date = (res["aggregations"]["articles_over_time"]["buckets"][num]["key_as_string"])
-       count = (res["aggregations"]["articles_over_time"]["buckets"][num]["doc_count"])
-       sheet1.write((num+1),0,date)
-       sheet1.write((num+1),1,count)
+        res = esCluster.search(index="articles", doc_type="article", body=body[out])
+        print (res["aggregations"]["articles_over_time"]["buckets"][num]["key_as_string"])
+        print (res["aggregations"]["articles_over_time"]["buckets"][num]["doc_count"])
+        date = (res["aggregations"]["articles_over_time"]["buckets"][num]["key_as_string"])
+        count = (res["aggregations"]["articles_over_time"]["buckets"][num]["doc_count"])
+        sheet1.write((num+1+(out*8)),0,date)
+        sheet1.write((num+1+(out*8)),1,count)
+      if out!=0:
+        #print (out)
+        sheet1.write((out*8),0,"健康")
     book.save(filename)
   
 if __name__ == '__main__':
