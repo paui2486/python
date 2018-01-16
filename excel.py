@@ -21,8 +21,16 @@ book = xlwt.Workbook(encoding="utf-8")
 #使用Workbook裡的add_sheet函式來建立Worksheet
 sheet1 = book.add_sheet("Sheet1")
 
+def output(filename):
+    #使用Worksheet裡的write函式將值寫入
+    sheet1.write(0,0,'日期')
+    sheet1.write(0,1,'總和')
+
+    book.save(filename)
+
 categories = ['育兒','健康','社會','教育','娛樂','汽車','美食','家居','旅遊','時尚','文化','其他','軍事','國際','職場','科技','科學','遊戲','體育']
 
+#for cat in (0,20):
 body =[{
     "size" : 0,
     "query": {
@@ -68,27 +76,31 @@ body =[{
     }
 }]
 
-def output(filename):
-    #使用Worksheet裡的write函式將值寫入
-    sheet1.write(0,0,'日期')
-    sheet1.write(0,1,'總和')
 
-    book.save(filename)
+#def output(filename):
+    #使用Worksheet裡的write函式將值寫入
+  #  sheet1.write(0,0,'日期')
+ #   sheet1.write(0,1,'總和')
+
+   # book.save(filename)
   
 if __name__ == '__main__':
     
     for out in range(0,2):#外圈跑全部跟單一分類
-      for num in range(0,7):
-       res = esCluster.search(index="articles", doc_type="article", body=body[out])
-       print (res["aggregations"]["articles_over_time"]["buckets"][num]["key_as_string"])
-       print (res["aggregations"]["articles_over_time"]["buckets"][num]["doc_count"])
-       date = (res["aggregations"]["articles_over_time"]["buckets"][num]["key_as_string"])
-       count = (res["aggregations"]["articles_over_time"]["buckets"][num]["doc_count"])
-       sheet1.write((num+1+(out*8)),0,date)
-       sheet1.write((num+1+(out*8)),1,count)
-      if out!=0:
-        #print (out)
-        sheet1.write((out*8),0,"健康")
-    #book.save(filename)
+    #  for cat in (0,20):
+        for num in range(0,7):
+         res = esCluster.search(index="articles", doc_type="article", body=body[out])
+         print (res["aggregations"]["articles_over_time"]["buckets"][num]["key_as_string"])
+         print (res["aggregations"]["articles_over_time"]["buckets"][num]["doc_count"])
+         date = (res["aggregations"]["articles_over_time"]["buckets"][num]["key_as_string"])
+         count = (res["aggregations"]["articles_over_time"]["buckets"][num]["doc_count"])
+         sheet1.write((num+1+(out*8)),0,date)
+         sheet1.write((num+1+(out*8)),1,count)
+        if out!=0:
+          #print (out)
+          sheet1.write((out*8),0,"健康")
+      
+    
+     #book.save(filename)
     filename = "/home/paul/example.csv"
     output(filename)
